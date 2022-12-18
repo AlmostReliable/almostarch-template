@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "${modId}",
   "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "${modName}",
+  "description": "${modDescription}",
   "authors": [
-    "Me!"
+    "${modAuthor}"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://almostreliable.com/",
+    "sources": "https://github.com/${githubUser}/${githubRepo}"
   },
-  "license": "Insert License Here",
-  "icon": "assets/examplemod/icon.png",
+  "license": "${license}",
+  "icon": "assets/${modId}/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.examplemod.fabric.ExampleModFabric"
+      "com.almostreliable.almostarch.fabric.FabricInitializer"
     ]
   },
   "mixins": [
-    "examplemod.mixins.json",
-    "examplemod-common.mixins.json"
+    "almostarch-common.mixins.json",
+    "almostarch-fabric.mixins.json"
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.19.2",
-    "architectury": ">=6.2.43"
+    "minecraft": ">=${minecraftVersion}",
+    "java": ">=17"
   }
 }
