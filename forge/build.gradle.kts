@@ -33,5 +33,5 @@ dependencies {
 	forge("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
 	common(project(":common", "namedElements")) { isTransitive = false }
-	shadowCommon(project(":common", "transformProductionFabric")) { isTransitive = false }
+	shadowCommon(project(":common", "transformProductionForge")) { isTransitive = false }
 }
