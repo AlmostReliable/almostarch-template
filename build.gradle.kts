@@ -6,6 +6,7 @@ val fabricLoaderVersion: String by project
 val fabricApiVersion: String by project
 val forgeVersion: String by project
 val minecraftVersion: String by project
+val modPackage: String by project
 val modVersion: String by project
 val modId: String by project
 val modName: String by project
@@ -21,6 +22,7 @@ plugins {
 	id("io.github.juuxel.loom-quiltflower") version "1.8.0" apply false
 	id("dev.architectury.loom") version ("0.12.0-SNAPSHOT") apply false
 	id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+	id("com.almostreliable.almostgradle") apply false
 }
 
 architectury {
@@ -61,6 +63,7 @@ subprojects {
 	apply(plugin = "dev.architectury.loom")
 	apply(plugin = "maven-publish")
 	apply(plugin = "io.github.juuxel.loom-quiltflower")
+	apply(plugin = "com.almostreliable.almostgradle")
 
 	base.archivesName.set("$modId-${project.name.toLowerCase()}")
 	version = "$minecraftVersion-$modVersion"
@@ -129,6 +132,15 @@ subprojects {
 	 */
 	architectury {
 		compileOnly()
+	}
+
+	/**
+	 * One time initialization for the project. Can be removed after the project setup is complete.
+	 */
+	tasks.named<com.almostreliable.mods.almostgradle.UpdateMixinPackageTask>("updateMixinPackage") {
+		mixinPackage(modPackage)
+		mixinFileNames("$modId-${project.name.toLowerCase()}.mixins.json")
+		projectAsSubpackage(project.path != ":common")
 	}
 
 	/**

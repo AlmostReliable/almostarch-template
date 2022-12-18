@@ -2,10 +2,8 @@
   "required": true,
   "package": "com.almostreliable.almostarch.fabric.mixin",
   "compatibilityLevel": "JAVA_17",
-  "client": [
-  ],
-  "mixins": [
-  ],
+  "client": [],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }
