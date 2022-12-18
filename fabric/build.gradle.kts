@@ -1,7 +1,6 @@
-val enabledPlatforms: String by project
+val minecraftVersion: String by project
 val fabricLoaderVersion: String by project
 val fabricApiVersion: String by project
-val architecturyVersion: String by project
 
 plugins {
 	id("com.github.johnrengelman.shadow") version ("7.1.2")
@@ -22,11 +21,8 @@ loom {
 val common by configurations
 val shadowCommon by configurations
 dependencies {
-	modImplementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
-	modApi("net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}")
-
-	// Remove the next line if you don't want to depend on the API
-	modApi("dev.architectury:architectury-fabric:${architecturyVersion}")
+	modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+	modApi("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion+$minecraftVersion")
 
 	common(project(":common", "namedElements")) { isTransitive = false }
 	shadowCommon(project(":common", "transformProductionFabric")) { isTransitive = false }

@@ -1,8 +1,6 @@
-val enabledPlatforms: String by project
+val minecraftVersion: String by project
 val forgeVersion: String by project
-val architecturyVersion: String by project
 val modId: String by project
-val enableAccessWidener: String by project
 
 
 plugins {
@@ -32,9 +30,7 @@ loom {
 val common by configurations
 val shadowCommon by configurations
 dependencies {
-	forge("net.minecraftforge:forge:${forgeVersion}")
-	// Remove the next line if you don't want to depend on the API
-	modApi("dev.architectury:architectury-forge:${architecturyVersion}")
+	forge("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 
 	common(project(":common", "namedElements")) { isTransitive = false }
 	shadowCommon(project(":common", "transformProductionFabric")) { isTransitive = false }

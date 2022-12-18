@@ -1,12 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.task.RemapJarTask
 
-val enabledPlatforms: String by project
 val license: String by project
 val fabricLoaderVersion: String by project
 val fabricApiVersion: String by project
 val forgeVersion: String by project
-val architecturyVersion: String by project
 val minecraftVersion: String by project
 val modVersion: String by project
 val modId: String by project
@@ -29,6 +27,8 @@ architectury {
 	minecraft = minecraftVersion
 }
 
+val extraModsPrefix = "extra-mods"
+
 allprojects {
 	apply(plugin = "java")
 	apply(plugin = "architectury-plugin")
@@ -37,6 +37,10 @@ allprojects {
 	repositories {
 		mavenLocal()
 		mavenCentral()
+		flatDir {
+			name = extraModsPrefix
+			dir(file("$extraModsPrefix-$minecraftVersion"))
+		}
 	}
 
 	tasks {
@@ -68,9 +72,26 @@ subprojects {
 	 * General dependencies we want to use for all subprojects. E.g. mappings or the minecraft version.
 	 */
 	dependencies {
-		// Kotlin accessor methods are not generated in this gradle, but we can access them through quoted names.
+		/**
+		 * Kotlin accessor methods are not generated in this gradle, but we can access them through quoted names.
+		 */
 		"minecraft"("com.mojang:minecraft:${minecraftVersion}")
 		"mappings"(loom.officialMojangMappings())
+
+		/**
+		 * Helps to load mods in development through an extra directory. Sadly this does not support transitive dependencies. :-(
+		 */
+		fileTree("$extraModsPrefix-$minecraftVersion") { include("**/*.jar") }
+			.forEach { f ->
+				val sepIndex = f.nameWithoutExtension.lastIndexOf('-');
+				if (sepIndex == -1) {
+					throw IllegalArgumentException("Invalid mod name: '${f.nameWithoutExtension}'. Expected format: 'modName-version.jar'")
+				}
+				val mod = f.nameWithoutExtension.substring(0, sepIndex);
+				val version = f.nameWithoutExtension.substring(sepIndex + 1);
+				println("Extra mod ${f.nameWithoutExtension} detected.")
+				"modLocalRuntime"("extra-mods:$mod:$version")
+			}
 
 		/**
 		 * Non Minecraft dependencies
@@ -124,7 +145,9 @@ subprojects {
 			"minecraftVersion" to minecraftVersion,
 			"modAuthor" to modAuthor,
 			"modDescription" to modDescription,
+			"fabricApiVersion" to fabricApiVersion,
 			"forgeVersion" to forgeVersion,
+			"forgeFMLVersion" to forgeVersion.substringBefore("."), // Only use major version as FML error message sucks and the error message for wrong forge version is way better.
 			"githubUser" to githubUser,
 			"githubRepo" to githubRepo
 		)

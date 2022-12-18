@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[${forgeVersion},)"
+loaderVersion = "[${forgeFMLVersion},)"
 issueTrackerURL = "https://github.com/${githubUser}/${githubRepo}/issues"
 license = "${license}"
 

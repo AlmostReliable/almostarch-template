@@ -24,7 +24,7 @@
     "almostarch-fabric.mixins.json"
   ],
   "depends": {
-    "fabric": "*",
+    "fabric": ">=${fabricApiVersion}",
     "minecraft": ">=${minecraftVersion}",
     "java": ">=17"
   }
