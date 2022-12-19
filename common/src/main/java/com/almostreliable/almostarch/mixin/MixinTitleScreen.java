@@ -1,5 +1,6 @@
 package com.almostreliable.almostarch.mixin;
 
+import com.almostreliable.almostarch.AlmostArchMod;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +12,6 @@ public class MixinTitleScreen {
 
 	@Inject(at = @At("HEAD"), method = "init()V")
 	private void init(CallbackInfo info) {
-		System.out.println("Hello from example common mixin!");
+		AlmostArchMod.LOG.info("Hello from example common mixin!");
 	}
 }
