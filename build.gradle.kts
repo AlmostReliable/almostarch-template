@@ -182,63 +182,65 @@ subprojects {
  * Subproject configurations and tasks we only want to apply to subprojects which are not the common project. E.g. fabric or forge.
  */
 subprojects {
-	if (project.path != ":common") {
-		apply(plugin = "com.github.johnrengelman.shadow")
+	if(project.path == ":common") {
+		return@subprojects
+	}
 
-		extensions.configure<LoomGradleExtensionAPI> {
-			runs {
-				forEach { it ->
-					it.runDir(if (sharedRunDir.toBoolean()) "../run" else "run")
-					// Allows hot swapping when using Jetbrains Runtime (https://github.com/JetBrains/JetBrainsRuntime)
-					it.vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
-				}
-			}
+	apply(plugin = "com.github.johnrengelman.shadow")
 
-			/**
-			 * "main" matches the default mod's name. Since we are using `compileOnly()` in Architectur, we need to set up
-			 * the local mods as well for the loaders. Otherwise, they don't understand that :common exists.
-			 */
-			with(mods.maybeCreate("main")) {
-				fun Project.sourceSets() = extensions.getByName<SourceSetContainer>("sourceSets")
-				sourceSet(sourceSets().getByName("main"))
-				sourceSet(project(":common").sourceSets().getByName("main"))
+	extensions.configure<LoomGradleExtensionAPI> {
+		runs {
+			forEach { it ->
+				it.runDir(if (sharedRunDir.toBoolean()) "../run" else "run")
+				// Allows hot swapping when using Jetbrains Runtime (https://github.com/JetBrains/JetBrainsRuntime)
+				it.vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
 			}
 		}
 
-		val common by configurations.creating
-		val shadowCommon by configurations.creating // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
-		configurations {
-			"compileClasspath" { extendsFrom(common) }
-			"runtimeClasspath" { extendsFrom(common) }
+		/**
+		 * "main" matches the default mod's name. Since we are using `compileOnly()` in Architectur, we need to set up
+		 * the local mods as well for the loaders. Otherwise, they don't understand that :common exists.
+		 */
+		with(mods.maybeCreate("main")) {
+			fun Project.sourceSets() = extensions.getByName<SourceSetContainer>("sourceSets")
+			sourceSet(sourceSets().getByName("main"))
+			sourceSet(project(":common").sourceSets().getByName("main"))
+		}
+	}
+
+	val common by configurations.creating
+	val shadowCommon by configurations.creating // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+	configurations {
+		"compileClasspath" { extendsFrom(common) }
+		"runtimeClasspath" { extendsFrom(common) }
+	}
+
+	with(components["java"] as AdhocComponentWithVariants) {
+		withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) { skip() }
+	}
+
+	tasks {
+		named<ShadowJar>("shadowJar") {
+			exclude("architectury.common.json")
+			configurations = listOf(shadowCommon)
+			archiveClassifier.set("dev-shadow")
 		}
 
-		with(components["java"] as AdhocComponentWithVariants) {
-			withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) { skip() }
+		named<RemapJarTask>("remapJar") {
+			inputFile.set(named<ShadowJar>("shadowJar").get().archiveFile)
+			dependsOn("shadowJar")
+			classifier = null
 		}
 
-		tasks {
-			named<ShadowJar>("shadowJar") {
-				exclude("architectury.common.json")
-				configurations = listOf(shadowCommon)
-				archiveClassifier.set("dev-shadow")
-			}
+		named<Jar>("jar") {
+			archiveClassifier.set("dev")
+		}
 
-			named<RemapJarTask>("remapJar") {
-				inputFile.set(named<ShadowJar>("shadowJar").get().archiveFile)
-				dependsOn("shadowJar")
-				classifier = null
-			}
-
-			named<Jar>("jar") {
-				archiveClassifier.set("dev")
-			}
-
-			named<Jar>("sourcesJar") {
-				val commonSources = project(":common").tasks.named<Jar>("sourcesJar")
-				dependsOn(commonSources)
-				from(commonSources.get().archiveFile.map { zipTree(it) })
-				archiveClassifier.set("sources")
-			}
+		named<Jar>("sourcesJar") {
+			val commonSources = project(":common").tasks.named<Jar>("sourcesJar")
+			dependsOn(commonSources)
+			from(commonSources.get().archiveFile.map { zipTree(it) })
+			archiveClassifier.set("sources")
 		}
 	}
 }
