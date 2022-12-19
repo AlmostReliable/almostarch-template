@@ -1,4 +1,7 @@
+@file:Suppress("UnstableApiUsage")
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.task.RemapJarTask
 
 val license: String by project
@@ -14,6 +17,7 @@ val modDescription: String by project
 val modAuthor: String by project
 val githubRepo: String by project
 val githubUser: String by project
+val sharedRunDir: String by project
 
 plugins {
 	java
@@ -68,7 +72,7 @@ subprojects {
 	base.archivesName.set("$modId-${project.name.toLowerCase()}")
 	version = "$minecraftVersion-$modVersion"
 
-	val loom = project.extensions.getByName<net.fabricmc.loom.api.LoomGradleExtensionAPI>("loom")
+	val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
 	loom.silentMojangMappingsLicense()
 
 	/**
@@ -78,7 +82,7 @@ subprojects {
 		/**
 		 * Kotlin accessor methods are not generated in this gradle, but we can access them through quoted names.
 		 */
-		"minecraft"("com.mojang:minecraft:${minecraftVersion}")
+		"minecraft"("com.mojang:minecraft:$minecraftVersion")
 		"mappings"(loom.officialMojangMappings())
 
 		/**
@@ -180,6 +184,26 @@ subprojects {
 subprojects {
 	if (project.path != ":common") {
 		apply(plugin = "com.github.johnrengelman.shadow")
+
+		extensions.configure<LoomGradleExtensionAPI> {
+			runs {
+				forEach { it ->
+					it.runDir(if (sharedRunDir.toBoolean()) "../run" else "run")
+					// Allows hot swapping when using Jetbrains Runtime (https://github.com/JetBrains/JetBrainsRuntime)
+					it.vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
+				}
+			}
+
+			/**
+			 * "main" matches the default mod's name. Since we are using `compileOnly()` in Architectur, we need to set up
+			 * the local mods as well for the loaders. Otherwise, they don't understand that :common exists.
+			 */
+			with(mods.maybeCreate("main")) {
+				fun Project.sourceSets() = extensions.getByName<SourceSetContainer>("sourceSets")
+				sourceSet(sourceSets().getByName("main"))
+				sourceSet(project(":common").sourceSets().getByName("main"))
+			}
+		}
 
 		val common by configurations.creating
 		val shadowCommon by configurations.creating // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
