@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod(BuildConfig.MOD_ID)
 public class ForgeInitializer {
 
-	public ForgeInitializer() {
-		AlmostArchMod.init();
-	}
+    public ForgeInitializer() {
+        AlmostArchMod.init();
+    }
 }

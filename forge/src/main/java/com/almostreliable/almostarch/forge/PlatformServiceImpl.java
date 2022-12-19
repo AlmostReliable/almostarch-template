@@ -8,18 +8,18 @@ import net.minecraftforge.fml.loading.FMLLoader;
 @AutoService(PlatformService.class)
 public class PlatformServiceImpl implements PlatformService {
 
-	@Override
-	public Platform getPlatform() {
-		return Platform.Forge;
-	}
+    @Override
+    public Platform getPlatform() {
+        return Platform.Forge;
+    }
 
-	@Override
-	public boolean isModLoaded(String modId) {
-		return ModList.get().isLoaded(modId);
-	}
+    @Override
+    public boolean isModLoaded(String modId) {
+        return ModList.get().isLoaded(modId);
+    }
 
-	@Override
-	public boolean isDevelopmentEnvironment() {
-		return !FMLLoader.isProduction();
-	}
+    @Override
+    public boolean isDevelopmentEnvironment() {
+        return !FMLLoader.isProduction();
+    }
 }

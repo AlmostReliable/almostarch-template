@@ -7,18 +7,18 @@ import net.fabricmc.loader.api.FabricLoader;
 @AutoService(PlatformService.class)
 public class PlatformServiceImpl implements PlatformService {
 
-	@Override
-	public Platform getPlatform() {
-		return Platform.Fabric;
-	}
+    @Override
+    public Platform getPlatform() {
+        return Platform.Fabric;
+    }
 
-	@Override
-	public boolean isModLoaded(String modId) {
-		return FabricLoader.getInstance().isModLoaded(modId);
-	}
+    @Override
+    public boolean isModLoaded(String modId) {
+        return FabricLoader.getInstance().isModLoaded(modId);
+    }
 
-	@Override
-	public boolean isDevelopmentEnvironment() {
-		return FabricLoader.getInstance().isDevelopmentEnvironment();
-	}
+    @Override
+    public boolean isDevelopmentEnvironment() {
+        return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
 }

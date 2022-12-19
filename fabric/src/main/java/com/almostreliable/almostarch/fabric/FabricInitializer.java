@@ -5,8 +5,8 @@ import net.fabricmc.api.ModInitializer;
 
 public class FabricInitializer implements ModInitializer {
 
-	@Override
-	public void onInitialize() {
-		AlmostArchMod.init();
-	}
+    @Override
+    public void onInitialize() {
+        AlmostArchMod.init();
+    }
 }
